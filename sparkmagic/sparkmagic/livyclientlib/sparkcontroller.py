@@ -80,13 +80,27 @@ class SparkController(object):
             session = self._livy_session(http_client, {constants.LIVY_KIND_PARAM: response[constants.LIVY_KIND_PARAM]},
                                         self.ipython_display, session_id)
             session.delete()
+    
+    def reconnect_session_by_id(self, endpoint, session_id):
+        name = self.session_manager.get_session_name_by_id_endpoint(session_id, endpoint)
 
-    def add_session(self, name, endpoint, skip_if_exists, properties):
+        if name in self.session_manager.get_sessions_list():
+            self.logger.debug("You are already connected to this session.") # TODO: mozna ne? otestit
+        else:
+            http_client = self._http_client(endpoint)
+            response = http_client.get_session(session_id)
+            http_client = self._http_client(endpoint)
+            session = self._livy_session(http_client, {constants.LIVY_KIND_PARAM: response[constants.LIVY_KIND_PARAM]},
+                                        self.ipython_display, session_id)
+            self.session_manager.add_session(name, session)
+            session.reconnect()
+
+    def add_session(self, name, endpoint, skip_if_exists, properties, session_id=-1):
         if skip_if_exists and (name in self.session_manager.get_sessions_list()):
             self.logger.debug(u"Skipping {} because it already exists in list of sessions.".format(name))
             return
         http_client = self._http_client(endpoint)
-        session = self._livy_session(http_client, properties, self.ipython_display)
+        session = self._livy_session(http_client, properties, self.ipython_display, session_id=session_id)
         self.session_manager.add_session(name, session)
         session.start()
 

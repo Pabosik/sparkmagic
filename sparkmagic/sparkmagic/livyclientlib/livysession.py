@@ -179,6 +179,54 @@ class LivySession(ObjectWithGuid):
         else:
             self._spark_events.emit_session_creation_end_event(self.guid, self.kind, self.id, self.status, True, "", "")
 
+    def reconnect(self):
+        """Reconnect the session against actual livy server."""
+        self._printed_resource_warning = False
+
+        try:
+            r = self._http_client.get_session(self.id)
+            self.status = str(r[u"state"])
+
+            self.ipython_display.writeln(u"Reconnecting Spark application")
+
+            # Start heartbeat thread to keep Livy interactive session alive.
+            self._start_heartbeat_thread()
+
+            # We wait for livy_session_startup_timeout_seconds() for the session to start up.
+            try:
+                self.wait_for_idle(conf.livy_session_startup_timeout_seconds())
+            except LivyClientTimeoutException:
+                raise LivyClientTimeoutException(u"Session {} did not start up in {} seconds."
+                                                 .format(self.id, conf.livy_session_startup_timeout_seconds()))
+
+            html = get_sessions_info_html([self], self.id)
+            self.ipython_display.html(html)
+
+            command = Command("spark")
+            (success, out, mimetype) = command.execute(self)
+
+            if success:
+                self.ipython_display.writeln(u"SparkSession available as 'spark'.")
+                self.sql_context_variable_name = "spark"
+            else:
+                command = Command("sqlContext")
+                (success, out, mimetype) = command.execute(self)
+                if success:
+                    self.ipython_display.writeln(u"SparkContext available as 'sc'.")
+                    if ("hive" in out.lower()):
+                        self.ipython_display.writeln(u"HiveContext available as 'sqlContext'.")
+                    else:
+                        self.ipython_display.writeln(u"SqlContext available as 'sqlContext'.")
+                    self.sql_context_variable_name = "sqlContext"
+                else:
+                    raise SqlContextNotFoundException(u"Neither SparkSession nor HiveContext/SqlContext is available.")
+        except Exception as e:
+            self._spark_events.emit_session_creation_end_event(self.guid, self.kind, self.id, self.status,
+                                                               False, e.__class__.__name__, str(e))
+            raise
+        else:
+            self._spark_events.emit_session_creation_end_event(self.guid, self.kind, self.id, self.status, True, "", "")
+
     def get_app_id(self):
         if self._app_id is None:
             self._app_id = self._http_client.get_session(self.id).get("appId")

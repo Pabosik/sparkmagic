@@ -76,7 +76,8 @@ class ManageEndpointWidget(AbstractMenuWidget):
         # 400 px
         info = self.get_info_endpoint_widget(endpoint, url)
         delete_session_number = self.get_delete_session_endpoint_widget(url, endpoint)
-        vbox_left = self.ipywidget_factory.get_vbox(children=[info, delete_session_number], width="400px")
+        reconnect_session_number = self.get_reconnect_session_endpoint_widget(url, endpoint)
+        vbox_left = self.ipywidget_factory.get_vbox(children=[info, delete_session_number, reconnect_session_number], width="400px")
         return vbox_left
 
     def get_cleanup_button_endpoint(self, url, endpoint):
@@ -119,6 +120,22 @@ class ManageEndpointWidget(AbstractMenuWidget):
 
         button = self.ipywidget_factory.get_button(description="Delete")
         button.on_click(delete_endpoint)
+
+    def get_reconnect_session_endpoint_widget(self, url, endpoint):
+        session_text = self.ipywidget_factory.get_text(description="Session to reconnect:", value="0", width="50px")
+
+        def reconnect_endpoint(button):
+            try:
+                id = session_text.value
+                self.spark_controller.reconnect_session_by_id(endpoint, id) # TODO
+                self.ipython_display.writeln("Reconnected to session ID {} at {}".format(id, url))
+            except ValueError as e:
+                self.ipython_display.send_error(str(e))
+                return
+            self.refresh_method()
+
+        button = self.ipywidget_factory.get_button(description="Delete")
+        button.on_click(reconnect_endpoint)
 
         return self.ipywidget_factory.get_hbox(children=[session_text, button], width="152px")
 
