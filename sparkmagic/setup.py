@@ -14,8 +14,8 @@ PACKAGES            = ['sparkmagic',
                        'sparkmagic/serverextension']
 AUTHOR              = "Jupyter Development Team"
 AUTHOR_EMAIL        = "jupyter@googlegroups.org"
-URL                 = 'https://github.com/jupyter-incubator/sparkmagic'
-DOWNLOAD_URL        = 'https://github.com/jupyter-incubator/sparkmagic'
+URL                 = 'https://github.com/Pabosik/sparkmagic'
+DOWNLOAD_URL        = 'https://github.com/Pabosik/sparkmagic'
 LICENSE             = 'BSD 3-clause'
 
 import io
