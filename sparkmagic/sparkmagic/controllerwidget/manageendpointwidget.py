@@ -134,7 +134,7 @@ class ManageEndpointWidget(AbstractMenuWidget):
                 return
             self.refresh_method()
 
-        button = self.ipywidget_factory.get_button(description="Delete")
+        button = self.ipywidget_factory.get_button(description="Reconnect")
         button.on_click(reconnect_endpoint)
 
         return self.ipywidget_factory.get_hbox(children=[session_text, button], width="152px")
