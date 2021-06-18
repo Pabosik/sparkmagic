@@ -89,7 +89,6 @@ class SparkController(object):
         else:
             http_client = self._http_client(endpoint)
             response = http_client.get_session(session_id)
-            http_client = self._http_client(endpoint)
             session = self._livy_session(http_client, {constants.LIVY_KIND_PARAM: response[constants.LIVY_KIND_PARAM]},
                                         self.ipython_display, session_id)
             self.session_manager.add_session(name, session)

@@ -154,12 +154,12 @@ class LivySession(ObjectWithGuid):
             html = get_sessions_info_html([self], self.id)
             self.ipython_display.html(html)
 
-            command = Command("spark")
+            command = Command("ss")
             (success, out, mimetype) = command.execute(self)
 
             if success:
-                self.ipython_display.writeln(u"SparkSession available as 'spark'.")
-                self.sql_context_variable_name = "spark"
+                self.ipython_display.writeln(u"SparkSession available as 'ss")
+                self.sql_context_variable_name = "ss"
             else:
                 command = Command("sqlContext")
                 (success, out, mimetype) = command.execute(self)
