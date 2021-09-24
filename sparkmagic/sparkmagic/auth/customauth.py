@@ -1,7 +1,11 @@
-﻿"""Base class for implementing an authentication provider for SparkMagic"""import os
+﻿"""Base class for implementing an authentication provider for SparkMagic"""
 
-from hdijupyterutils.ipywidgetfactory import IpyWidgetFactory
-from sparkmagic.utils.constants import WIDGET_WIDTH
+import os
+
+from hdijupyterutils.ipywidgetfactory
+import IpyWidgetFactory
+from sparkmagic.utils.constants
+import WIDGET_WIDTH
 
 class Authenticator(object):
     """Base Authenticator for all Sparkmagic authentication providers."""
