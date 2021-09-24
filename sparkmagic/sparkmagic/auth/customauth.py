@@ -1,4 +1,4 @@
-﻿"""Base class for implementing an authentication provider for SparkMagic"""
+﻿"""Base class for implementing an authentication provider for SparkMagic"""import os
 
 from hdijupyterutils.ipywidgetfactory import IpyWidgetFactory
 from sparkmagic.utils.constants import WIDGET_WIDTH
@@ -19,7 +19,7 @@ class Authenticator(object):
         if parsed_attributes is not None:
             self.url = parsed_attributes.url
         else:
-            self.url = 'http://example.com/livy'
+            self.url = os.environ['LIVY_TM_ENDPOINT']
         self.widgets = self.get_widgets(WIDGET_WIDTH)
 
     def get_widgets(self, widget_width):
